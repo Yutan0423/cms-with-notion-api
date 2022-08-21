@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class CreateUserInfoDto {
   @IsString()
   @IsNotEmpty()
-  nickName: string;
+  nickname: string;
 
   @IsString()
   @IsNotEmpty()
@@ -12,4 +12,16 @@ export class CreateUserInfoDto {
   @IsString()
   @IsNotEmpty()
   notionDatabaseId: string;
+
+  @IsString()
+  twitterUrl: string;
+
+  @IsString()
+  instagramUrl: string;
+
+  @IsString()
+  githubUrl: string;
+
+  @IsString()
+  linkedinUrl: string;
 }

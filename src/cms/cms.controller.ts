@@ -1,16 +1,26 @@
-import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CmsSetting } from '@prisma/client';
+import { CmsSetting, UserInfo } from '@prisma/client';
 import { CmsService } from './cms.service';
+import { GetCmsInfoDto } from './dto/get-cms-info.dto';
 import { UpdateCmsSettingDto } from './dto/update-cms-setting.dto';
 
-@UseGuards(AuthGuard('jwt'))
 @Controller('cms')
 export class CmsController {
   constructor(private readonly cmsService: CmsService) {}
 
+  @Get('user')
+  getCmsUserId(): Promise<Pick<CmsSetting, 'settingValue'>> {
+    return this.cmsService.getCmsUserId();
+  }
+
+  @Get('info')
+  getCmsInfo(@Body() dto: GetCmsInfoDto): Promise<any> {
+    return this.cmsService.getCmsInfo(dto.cmsUserId);
+  }
+
   @Patch('update')
-  updateUserInfo(@Body() dto: UpdateCmsSettingDto): Promise<any> {
+  updateCmsSetting(@Body() dto: UpdateCmsSettingDto): Promise<any> {
     return this.cmsService.updateCmsSetting(dto);
   }
 }

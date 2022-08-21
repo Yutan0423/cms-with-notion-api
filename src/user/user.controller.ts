@@ -20,6 +20,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  getLoginUser(@Req() req: Request): Promise<Omit<User, 'password'>> {
+    return this.userService.getLoginUser(req.user.id);
+  }
+
+  @Get('all')
   getUsers(): Promise<Omit<User[], 'password'>> {
     return this.userService.getUsers();
   }

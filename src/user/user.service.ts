@@ -9,6 +9,14 @@ import { UpdateUserInfoDto } from './dto/update-user-info.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
+  getLoginUser(userId: number): Promise<Omit<User, 'password'>> {
+    return this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+  }
+
   getUsers(): Promise<Omit<User[], 'password'>> {
     return this.prisma.user.findMany();
   }
@@ -21,9 +29,12 @@ export class UserService {
       include: {
         userInfo: {
           select: {
-            nickName: true,
             notionKey: true,
             notionDatabaseId: true,
+            twitterUrl: true,
+            instagramUrl: true,
+            githubUrl: true,
+            linkedinUrl: true,
           },
         },
       },
@@ -32,14 +43,25 @@ export class UserService {
     return userInfo;
   }
 
-  async createUserInfo(
-    userId: number,
-    dto: CreateUserInfoDto,
-  ): Promise<UserInfo> {
+  async createUserInfo(userId: number, dto: CreateUserInfoDto): Promise<any> {
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        nickname: dto.nickname,
+      },
+    });
+
     const userInfo = await this.prisma.userInfo.create({
       data: {
         userId,
-        ...dto,
+        notionKey: dto.notionKey,
+        notionDatabaseId: dto.notionDatabaseId,
+        twitterUrl: dto.twitterUrl,
+        instagramUrl: dto.instagramUrl,
+        githubUrl: dto.githubUrl,
+        linkedinUrl: dto.linkedinUrl,
       },
     });
 
@@ -47,16 +69,32 @@ export class UserService {
   }
 
   async updateUserInfo(userId: number, dto: UpdateUserInfoDto): Promise<any> {
-    const userInfo = await this.prisma.userInfo.update({
+    const user = await this.prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        ...dto,
+        nickname: dto.nickname,
+      },
+    });
+    if (!user || user.id !== userId)
+      throw new ForbiddenException('No permission to update');
+
+    const userInfo = await this.prisma.userInfo.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        notionKey: dto.notionKey,
+        notionDatabaseId: dto.notionDatabaseId,
+        twitterUrl: dto.twitterUrl,
+        instagramUrl: dto.instagramUrl,
+        githubUrl: dto.githubUrl,
+        linkedinUrl: dto.linkedinUrl,
       },
     });
     if (!userInfo || userInfo.userId !== userId)
-      throw new ForbiddenException('No permission to update.');
+      throw new ForbiddenException('No permission to update');
 
     return userInfo;
   }
