@@ -47,6 +47,7 @@ export class UserController {
     @Req() req: Request,
     @Body() dto: UpdateUserInfoDto,
   ): Promise<any> {
+    console.log('----------------------------');
     return this.userService.updateUserInfo(req.user.id, dto);
   }
 }
