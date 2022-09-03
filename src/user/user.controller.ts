@@ -14,7 +14,7 @@ import { CreateUserInfoDto } from './dto/create-user-info.dto';
 import { UpdateUserInfoDto } from './dto/update-user-info.dto';
 import { UserService } from './user.service';
 
-@UseGuards(AuthGuard('jwt'))
+// @UseGuards(AuthGuard('jwt'))
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -48,6 +48,7 @@ export class UserController {
     @Body() dto: UpdateUserInfoDto,
   ): Promise<any> {
     console.log('-----------------------'.repeat(10));
+    console.log(req);
     return this.userService.updateUserInfo(req.user.id, dto);
   }
 }
